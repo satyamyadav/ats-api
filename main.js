@@ -13,7 +13,7 @@ global.github = new GitHubApi({
     },
     Promise: Promise,
     followRedirects: false,
-    timeout: 5000
+    timeout: 5000000000
 });
 
 // So that JSON.stringify(date) doesn't fuck things up

@@ -9,7 +9,7 @@ var request = require('request');
 app.get('/:github', (req, res) => {
 
     var data = {};
-    var username = 'krishnaxv';
+    var username = 'ayusharma';
 
     github.repos.getForUser({
         username: username,
@@ -46,11 +46,16 @@ app.get('/:github', (req, res) => {
 
         });
 
+
+        github.users.getEmails({}).then(function(resp){
+          data['email'] = resp;
+        });
+
         Promise.all(props).then(function(resp) {
             data['languages'] = _.countBy(languages);
-            data['self_projects'] = self_projects;
-            data['forked_projects'] = forked_projects;
-            data['commits'] = resp;
+            data['self_projects'] = _.sortBy(self_projects,[function(o){ return o.stargazers_count}]);
+            data['forked_projects'] =  _.sortBy(forked_projects,[function(o){ return o.stargazers_count}]);;
+            data['commits'] = _.flattenDeep(resp).length;
             res.send(data);
         })
     })
