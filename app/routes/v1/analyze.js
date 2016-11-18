@@ -9,20 +9,20 @@ var request = require('request');
 app.get('/:github', (req, res) => {
 
     var data = {};
-    var username = 'ayusharma';
+    var username = 'krishnaxv';
 
     github.repos.getForUser({
         username: username,
         per_page: 999
 
-    }, function(err, response) {
-
+    }).then(function(response) {
+        console.log('edhar res');
+        var props = [];
         var languages = [];
         var self_projects = [];
         var forked_projects = [];
-        var total_commits = 0;
-
-        response.forEach(function(key) {
+        var total_commits = [];
+        response.forEach(function(key, index, array) {
             var projectObject = {};
 
             if (key.language !== null && !key.fork) {
@@ -35,23 +35,24 @@ app.get('/:github', (req, res) => {
                 self_projects.push(key);
             }
 
-            // github.repos.getCommits({
-            //   owner:username,
-            //   repo: key.name
-            // }, function(err, resp) {
-            //   total_commits = total_commits+resp.length;
-            //   console.log('hello')
-            // })
-            //
-            // data['total_commits'] = total_commits;
+            var tc = github.repos.getCommits({
+                owner: username,
+                repo: key.name
+            }).then(function(d) {
+                return d;
+            })
+
+            props.push(tc);
 
         });
 
-        data['languages'] = _.countBy(languages);
-        data['self_projects'] = self_projects;
-        data['forked_projects'] = forked_projects;
-
-        res.send(data);
-    });
+        Promise.all(props).then(function(resp) {
+            data['languages'] = _.countBy(languages);
+            data['self_projects'] = self_projects;
+            data['forked_projects'] = forked_projects;
+            data['commits'] = resp;
+            res.send(data);
+        })
+    })
 
 });
