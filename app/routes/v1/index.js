@@ -24,3 +24,5 @@ app.set('views', __dirname+'/views');
 
 // load up the routes
 app.use('/users', require('./users'));
+
+app.use('/analyze', require('./analyze'));
